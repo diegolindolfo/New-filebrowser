@@ -46,9 +46,13 @@ export async function patchResource(
   action: PatchAction
 ): Promise<void> {
   const encoded = encodeURI(path).replace(/#/g, "%23");
-  await apiFetch(`/resources${encoded}`, {
+  const params = new URLSearchParams();
+  params.set("action", action.action);
+  params.set("destination", action.destination);
+  if (action.override) params.set("override", "true");
+  if (action.rename) params.set("rename", "true");
+  await apiFetch(`/resources${encoded}?${params.toString()}`, {
     method: "PATCH",
-    body: JSON.stringify(action),
   });
 }
 

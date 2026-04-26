@@ -167,16 +167,20 @@ export default function FileBrowser() {
         case "paste": {
           const clip = store.clipboard;
           if (!clip) break;
-          for (const item of clip.items) {
-            await patchResource(item.path, {
-              action: clip.action === "cut" ? "rename" : "copy",
-              destination: `${currentPath}${item.name}`,
-              override: false,
-              rename: true,
-            });
+          try {
+            for (const item of clip.items) {
+              await patchResource(item.path, {
+                action: clip.action === "cut" ? "rename" : "copy",
+                destination: `${currentPath}${item.name}`,
+                override: false,
+                rename: true,
+              });
+            }
+            store.clearClipboard();
+            refetch();
+          } catch (e) {
+            alert(`Erro ao colar: ${e instanceof Error ? e.message : e}`);
           }
-          store.clearClipboard();
-          refetch();
           break;
         }
         case "clearClipboard":
@@ -190,18 +194,22 @@ export default function FileBrowser() {
   const handleRename = useCallback(
     async (newName: string) => {
       if (!renameItem) return;
-      const dir = renameItem.path.substring(
-        0,
-        renameItem.path.lastIndexOf("/") + 1
-      );
-      await patchResource(renameItem.path, {
-        action: "rename",
-        destination: `${dir}${newName}`,
-        override: false,
-        rename: false,
-      });
-      setRenameItem(null);
-      refetch();
+      try {
+        const dir = renameItem.path.substring(
+          0,
+          renameItem.path.lastIndexOf("/") + 1
+        );
+        await patchResource(renameItem.path, {
+          action: "rename",
+          destination: `${dir}${newName}`,
+          override: false,
+          rename: false,
+        });
+        setRenameItem(null);
+        refetch();
+      } catch (e) {
+        alert(`Erro ao renomear: ${e instanceof Error ? e.message : e}`);
+      }
     },
     [renameItem, refetch]
   );
