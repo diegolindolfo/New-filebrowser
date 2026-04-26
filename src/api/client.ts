@@ -21,7 +21,8 @@ export function clearToken() {
 
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  skipReloadOn401 = false
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -42,7 +43,9 @@ export async function apiFetch<T>(
 
   if (res.status === 401) {
     clearToken();
-    window.location.reload();
+    if (!skipReloadOn401) {
+      window.location.reload();
+    }
     throw new Error("Unauthorized");
   }
 
@@ -91,7 +94,18 @@ export async function loginNoAuth(): Promise<string> {
 }
 
 export async function renewToken(): Promise<string> {
-  const token = await apiFetch<string>("/renew", { method: "POST" });
+  const token = await apiFetch<string>("/renew", { method: "POST" }, true);
   setToken(token);
   return token;
+}
+
+export function getUserIdFromToken(): number {
+  const token = getToken();
+  if (!token) return 1;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.user?.id ?? 1;
+  } catch {
+    return 1;
+  }
 }

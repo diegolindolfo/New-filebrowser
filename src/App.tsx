@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "./stores/authStore";
-import { loginNoAuth, login, getToken, renewToken } from "./api/client";
+import { loginNoAuth, login, getToken, renewToken, getUserIdFromToken } from "./api/client";
 import { getUser } from "./api/users";
 import Layout from "./components/Layout";
 import FileBrowser from "./pages/FileBrowser";
@@ -24,7 +24,7 @@ export default function App() {
         if (existingToken) {
           try {
             await renewToken();
-            const user = await getUser(1);
+            const user = await getUser(getUserIdFromToken());
             setUser(user);
             setLoading(false);
             return;
@@ -36,7 +36,7 @@ export default function App() {
         // Try noauth login first (works when server has NoAuth enabled)
         try {
           await loginNoAuth();
-          const user = await getUser(1);
+          const user = await getUser(getUserIdFromToken());
           setUser(user);
           setNoAuth(true);
           setAuthMethod("noauth");
@@ -57,7 +57,7 @@ export default function App() {
 
   const handleLogin = async (username: string, password: string) => {
     await login(username, password);
-    const user = await getUser(1);
+    const user = await getUser(getUserIdFromToken());
     setUser(user);
   };
 

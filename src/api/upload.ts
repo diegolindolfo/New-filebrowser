@@ -57,7 +57,8 @@ export async function simpleUpload(
   onProgress?: (progress: number) => void
 ): Promise<void> {
   const token = getToken();
-  const encodedPath = encodeURI(`${path}/${file.name}`).replace(/#/g, "%23");
+  const cleanPath = path.endsWith("/") ? path : `${path}/`;
+  const encodedPath = encodeURI(`${cleanPath}${file.name}`).replace(/#/g, "%23");
 
   const xhr = new XMLHttpRequest();
 

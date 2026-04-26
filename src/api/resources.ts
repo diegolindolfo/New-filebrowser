@@ -16,8 +16,7 @@ export async function createResource(
   isDir: boolean
 ): Promise<void> {
   const encoded = encodeURI(path).replace(/#/g, "%23");
-  const override = isDir ? "" : "&override=false";
-  await apiFetch(`/resources${encoded}?override=false${override}`, {
+  await apiFetch(`/resources${encoded}?override=false`, {
     method: "POST",
     headers: isDir ? {} : { "Content-Type": "text/plain" },
     body: isDir ? undefined : "",
