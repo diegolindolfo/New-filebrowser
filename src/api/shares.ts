@@ -1,4 +1,4 @@
-import { apiFetch } from "./client";
+import { apiFetch, encodePath } from "./client";
 import type { Share } from "../types";
 
 export async function listShares(): Promise<Share[]> {
@@ -6,7 +6,7 @@ export async function listShares(): Promise<Share[]> {
 }
 
 export async function getSharesForPath(path: string): Promise<Share[]> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   return apiFetch<Share[]>(`/share${encoded}`);
 }
 
@@ -16,7 +16,7 @@ export async function createShare(
   password?: string,
   unit?: string
 ): Promise<Share> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   const body: Record<string, unknown> = {};
   if (expires) body.expires = expires;
   if (password) body.password = password;

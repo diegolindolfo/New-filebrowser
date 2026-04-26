@@ -39,8 +39,9 @@ export default function FileBrowser() {
   const store = useFileStore();
   const uploadStore = useUploadStore();
 
-  const currentPath =
+  const rawPath =
     "/" + (location.pathname.replace("/files", "").replace(/^\/+/, "") || "");
+  const currentPath = rawPath.endsWith("/") ? rawPath : `${rawPath}/`;
 
   const [contextMenu, setContextMenu] = useState<{
     item: FileItem;

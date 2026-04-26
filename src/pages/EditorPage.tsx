@@ -50,6 +50,7 @@ export default function EditorPage() {
     const load = async () => {
       try {
         const res = await fetch(rawDownloadUrl(path));
+        if (!res.ok) throw new Error(`Failed to load file: HTTP ${res.status}`);
         const text = await res.text();
 
         if (editorRef.current) {

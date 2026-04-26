@@ -1,5 +1,5 @@
 import * as tus from "tus-js-client";
-import { getToken } from "./client";
+import { getToken, encodePath } from "./client";
 
 export interface UploadProgress {
   file: File;
@@ -16,7 +16,7 @@ export function tusUpload(
   onError: (err: Error) => void
 ): tus.Upload {
   const token = getToken();
-  const encodedPath = encodeURI(path).replace(/#/g, "%23");
+  const encodedPath = encodePath(path);
 
   const upload = new tus.Upload(file, {
     endpoint: `/api/tus`,
@@ -58,7 +58,7 @@ export async function simpleUpload(
 ): Promise<void> {
   const token = getToken();
   const cleanPath = path.endsWith("/") ? path : `${path}/`;
-  const encodedPath = encodeURI(`${cleanPath}${file.name}`).replace(/#/g, "%23");
+  const encodedPath = encodePath(`${cleanPath}${file.name}`);
 
   const xhr = new XMLHttpRequest();
 

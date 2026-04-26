@@ -99,6 +99,13 @@ export async function renewToken(): Promise<string> {
   return token;
 }
 
+export function encodePath(path: string): string {
+  return path
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/");
+}
+
 export function getUserIdFromToken(): number {
   const token = getToken();
   if (!token) return 1;

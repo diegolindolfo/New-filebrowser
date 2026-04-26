@@ -1,13 +1,13 @@
-import { apiFetch, apiUrl } from "./client";
+import { apiFetch, apiUrl, encodePath } from "./client";
 import type { ResourceResponse, FileItem, PatchAction } from "../types";
 
 export async function getResource(path: string): Promise<ResourceResponse> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   return apiFetch<ResourceResponse>(`/resources${encoded}`);
 }
 
 export async function getFileContent(path: string): Promise<string> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   return apiFetch<string>(`/resources${encoded}`);
 }
 
@@ -15,7 +15,7 @@ export async function createResource(
   path: string,
   isDir: boolean
 ): Promise<void> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   await apiFetch(`/resources${encoded}?override=false`, {
     method: "POST",
     headers: isDir ? {} : { "Content-Type": "text/plain" },
@@ -27,7 +27,7 @@ export async function updateResource(
   path: string,
   content: string
 ): Promise<void> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   await apiFetch(`/resources${encoded}`, {
     method: "PUT",
     headers: { "Content-Type": "text/plain" },
@@ -36,7 +36,7 @@ export async function updateResource(
 }
 
 export async function deleteResource(path: string): Promise<void> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   await apiFetch(`/resources${encoded}`, { method: "DELETE" });
 }
 
@@ -44,7 +44,7 @@ export async function patchResource(
   path: string,
   action: PatchAction
 ): Promise<void> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   const params = new URLSearchParams();
   params.set("action", action.action);
   params.set("destination", action.destination);
@@ -59,12 +59,12 @@ export async function getChecksum(
   path: string,
   algo: string
 ): Promise<Record<string, string>> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   return apiFetch(`/resources${encoded}?checksum=${algo}`);
 }
 
 export function rawDownloadUrl(path: string): string {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   return apiUrl(`/raw${encoded}`);
 }
 
@@ -81,7 +81,7 @@ export function previewUrl(
   path: string,
   size: "thumb" | "big" = "thumb"
 ): string {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   return apiUrl(`/preview/${size}${encoded}`);
 }
 
@@ -89,7 +89,7 @@ export async function searchFiles(
   query: string,
   path: string = "/"
 ): Promise<FileItem[]> {
-  const encoded = encodeURI(path).replace(/#/g, "%23");
+  const encoded = encodePath(path);
   const res = await apiFetch<FileItem[]>(
     `/search${encoded}?query=${encodeURIComponent(query)}`
   );
