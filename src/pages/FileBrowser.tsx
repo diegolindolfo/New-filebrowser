@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -56,13 +56,15 @@ export default function FileBrowser() {
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["resources", currentPath],
-    queryFn: async () => {
-      const res = await getResource(currentPath);
-      store.setItems(res.items || []);
-      store.setPath(currentPath);
-      return res;
-    },
+    queryFn: () => getResource(currentPath),
   });
+
+  useEffect(() => {
+    if (data) {
+      store.setItems(data.items || []);
+      store.setPath(currentPath);
+    }
+  }, [data, currentPath]);
 
   const items = sortItems(data?.items || [], store.sorting);
 

@@ -186,7 +186,10 @@ function TextPreview({ item }: { item: FileItem }) {
   useEffect(() => {
     const url = rawDownloadUrl(item.path);
     fetch(url)
-      .then((r) => r.text())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.text();
+      })
       .then(setContent)
       .catch(() => setContent("Erro ao carregar arquivo"))
       .finally(() => setLoading(false));
